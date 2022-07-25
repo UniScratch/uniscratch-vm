@@ -1,12 +1,6 @@
 const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
-const Clone = require('../../util/clone');
-const Color = require('../../util/color');
-const formatMessage = require('format-message');
-const MathUtil = require('../../util/math-util');
-const RenderedTarget = require('../../sprites/rendered-target');
-const log = require('../../util/log');
 const StageLayering = require('../../engine/stage-layering');
 
 /**
@@ -30,7 +24,7 @@ const blockIconURI = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53
  * @constructor
  */
 class Scratch3CanvasBlocks {
-    constructor(runtime) {
+    constructor (runtime) {
         /**
          * The runtime instantiating this block package.
          * @type {Runtime}
@@ -41,7 +35,7 @@ class Scratch3CanvasBlocks {
     /**
      * @returns {object} metadata for this extension and its blocks.
      */
-    getInfo() {
+    getInfo () {
         return {
             id: 'canvas',
             name: 'Canvas',
@@ -434,34 +428,34 @@ class Scratch3CanvasBlocks {
                 opcode: 'stampOnStage',
                 blockType: BlockType.COMMAND,
                 text: 'stampOnStage'
-            },
+            }
             ],
             menus: {}
         };
     }
 
-    _createCanvas() {
-        var penSkinId = this.runtime.penSkinId;
-        if (penSkinId == undefined) return null;
-        var penSkin = this.runtime.renderer._allSkins[penSkinId];
-        var size = penSkin.size;
-        var w = size[0];
-        var h = size[1];
-        var tmpCanvas = document.createElement("canvas");
+    _createCanvas () {
+        const penSkinId = this.runtime.penSkinId;
+        if (typeof penSkinId === 'undefined') return null;
+        const penSkin = this.runtime.renderer._allSkins[penSkinId];
+        const size = penSkin.size;
+        const w = size[0];
+        const h = size[1];
+        const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = w;
         tmpCanvas.height = h;
-        var tmpCtx = tmpCanvas.getContext("2d");
+        const tmpCtx = tmpCanvas.getContext('2d');
         return {
             canvas: tmpCanvas,
             ctx: tmpCtx
         };
     }
 
-    _getContext(idx) {
+    _getContext (idx) {
         if (!this._ctx) {
             this._canvasList = [];
-            for (var i = 0; i < 8; i++) this._canvasList.push(null);
-            var tmpCanvas = this._createCanvas();
+            for (let i = 0; i < 8; i++) this._canvasList.push(null);
+            const tmpCanvas = this._createCanvas();
             if (!tmpCanvas) return null;
             this._canvasList[0] = tmpCanvas;
             this._canvas = tmpCanvas.canvas;
@@ -473,8 +467,8 @@ class Scratch3CanvasBlocks {
             this.runtime.renderer.updateDrawableSkinId(this._drawableId, this._skinId);
             this.runtime.renderer.updateDrawableVisible(this._drawableId, false);
         }
-        if (idx != null) {
-            var tmpCanvas = this._canvasList[idx];
+        if (idx !== null) {
+            let tmpCanvas = this._canvasList[idx];
             if (!tmpCanvas) {
                 tmpCanvas = this._createCanvas();
                 this._canvasList[idx] = tmpCanvas;
@@ -485,19 +479,19 @@ class Scratch3CanvasBlocks {
         return this._ctx;
     }
 
-    beginPath() {
+    beginPath () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.beginPath();
     }
 
-    closePath() {
+    closePath () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.closePath();
     }
 
-    moveTo(args, util) {
+    moveTo (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -505,7 +499,7 @@ class Scratch3CanvasBlocks {
         ctx.moveTo(x, y);
     }
 
-    lineTo(args, util) {
+    lineTo (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -513,7 +507,7 @@ class Scratch3CanvasBlocks {
         ctx.lineTo(x, y);
     }
 
-    rect(args, util) {
+    rect (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -523,7 +517,7 @@ class Scratch3CanvasBlocks {
         ctx.rect(x, y, w, h);
     }
 
-    arc(args, util) {
+    arc (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -534,60 +528,60 @@ class Scratch3CanvasBlocks {
         ctx.arc(x, y, radius, startAngle, endAngle);
     }
 
-    clip() {
+    clip () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.clip();
     }
 
-    setLineWidth(args, util) {
+    setLineWidth (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const lineWidth = args.LINE_WIDTH;
         ctx.lineWidth = lineWidth;
     }
 
-    setLineCap(args, util) {
+    setLineCap (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const lineCap = args.LINE_CAP;
         ctx.lineCap = lineCap;
     }
 
-    setStrokeStyle(args, util) {
+    setStrokeStyle (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const strokeStyle = args.STROKE_STYLE;
         ctx.strokeStyle = strokeStyle;
     }
 
-    setFillStyle(args, util) {
+    setFillStyle (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const fillStyle = args.FILL_STYLE;
         ctx.fillStyle = fillStyle;
     }
 
-    stroke() {
+    stroke () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.stroke();
     }
 
-    fill() {
+    fill () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.fill();
     }
 
-    setFont(args, util) {
+    setFont (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const font = args.FONT;
         ctx.font = font;
     }
 
-    strokeText(args, util) {
+    strokeText (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const text = args.TEXT;
@@ -596,7 +590,7 @@ class Scratch3CanvasBlocks {
         ctx.strokeText(text, x, y);
     }
 
-    fillText(args, util) {
+    fillText (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const text = args.TEXT;
@@ -605,14 +599,14 @@ class Scratch3CanvasBlocks {
         ctx.fillText(text, x, y);
     }
 
-    measureText(args, util) {
+    measureText (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const text = args.TEXT;
         return ctx.measureText(text).width;
     }
 
-    clearRect(args, util) {
+    clearRect (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -622,36 +616,37 @@ class Scratch3CanvasBlocks {
         ctx.clearRect(x, y, w, h);
     }
 
-    loadImage(args, util) {
-        const ctx = this._getContext();
+    loadImage (args) {
+        let ctx = this._getContext();
         if (!ctx) return;
         const imageId = args.IMAGE_ID;
-        let self = this;
+        const self = this;
         if (!this._bufferedImages[imageId]) {
             return new Promise(resolve => {
                 const img = new Image();
-                img.crossOrigin = "anonymous";
+                img.crossOrigin = 'anonymous';
                 img.onload = () => {
                     this._bufferedImages[imageId] = img;
 
-                    if (self._totalLoadedSize == null) self._totalLoadedSize = 0;
+                    if (self._totalLoadedSize === null) self._totalLoadedSize = 0;
                     self._totalLoadedSize += 128 * 1024;
                     if (self._totalLoadedSize >= 2 * 1024 * 1024) {
-                        var extUtils = self.runtime.extUtils;
-                        var ctx = extUtils.getContext();
+                        const extUtils = self.runtime.extUtils;
+                        ctx = extUtils.getContext();
                         extUtils.ajax({
                             url: '/WebApi/Log/BlobAccess',
-                            loadingStyle: "none",
+                            loadingStyle: 'none',
                             hashStr: '',
                             data: {
                                 targetType: ctx.targetType,
                                 targetId: ctx.target.id,
-                                deltaSize: this._totalLoadedSize,
+                                deltaSize: this._totalLoadedSize
                             },
                             type: 'POST'
-                        }).done(r => {
+                        }).done(() => {
                             self._totalLoadedSize = 0;
-                        }).error(r => { });
+                        })
+                            .error(() => { });
                     }
 
                     resolve();
@@ -659,13 +654,13 @@ class Scratch3CanvasBlocks {
                 img.onerror = () => {
                     resolve();
                 };
-                var extUtils = this.runtime.extUtils;
+                const extUtils = this.runtime.extUtils;
                 img.src = extUtils.getAssetFetchUrl(imageId);
             });
         }
     }
 
-    drawImage(args, util) {
+    drawImage (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const imageId = Cast.toString(args.IMAGE_ID);
@@ -676,13 +671,13 @@ class Scratch3CanvasBlocks {
             if (!img) return;
             ctx.drawImage(img, x, y);
         } else {
-            var idx = Math.min(Math.max(0, Cast.toNumber(args.IMAGE_ID)), 7);
-            var tmpCanvas = this._canvasList[idx];
+            const idx = Math.min(Math.max(0, Cast.toNumber(args.IMAGE_ID)), 7);
+            const tmpCanvas = this._canvasList[idx];
             if (tmpCanvas) ctx.drawImage(tmpCanvas.canvas, x, y);
         }
     }
 
-    scale(args, util) {
+    scale (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const scaleW = Cast.toNumber(args.SCALE_W);
@@ -690,14 +685,14 @@ class Scratch3CanvasBlocks {
         ctx.scale(scaleW, scaleH);
     }
 
-    rotate(args, util) {
+    rotate (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const angle = Cast.toNumber(args.ANGLE);
         ctx.rotate(angle);
     }
 
-    translate(args, util) {
+    translate (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const x = Cast.toNumber(args.X);
@@ -705,7 +700,7 @@ class Scratch3CanvasBlocks {
         ctx.translate(x, y);
     }
 
-    transform(args, util) {
+    transform (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const a = Cast.toNumber(args.A);
@@ -717,49 +712,49 @@ class Scratch3CanvasBlocks {
         ctx.transform(a, b, c, d, e, f);
     }
 
-    clearTransform(args, util) {
+    clearTransform () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    save() {
+    save () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.save();
     }
 
-    restore() {
+    restore () {
         const ctx = this._getContext();
         if (!ctx) return;
         ctx.restore();
     }
 
-    setGlobalAlpha(args, util) {
+    setGlobalAlpha (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const alpha = Cast.toNumber(args.ALPHA);
         ctx.globalAlpha = alpha;
     }
 
-    setGlobalCompositeOperation(args, util) {
+    setGlobalCompositeOperation (args) {
         const ctx = this._getContext();
         if (!ctx) return;
         const compositeOperation = args.CompositeOperation;
         ctx.globalCompositeOperation = compositeOperation;
     }
 
-    switchCanvas(args, util) {
+    switchCanvas (args) {
         const number = Math.min(Math.max(0, Cast.toNumber(args.NUMBER)), 7);
-        const ctx = this._getContext(number); //使用指定编号获取ctx时会自动设置为当前ctx
+        const _ctx = this._getContext(number); // 使用指定编号获取ctx时会自动设置为当前ctx
     }
 
-    stampOnStage() {
+    stampOnStage () {
         const ctx = this._getContext();
         if (!ctx) return;
 
-        var imageData = ctx.getImageData(0, 0, 480, 360);
-        var skin = this.runtime.renderer._allSkins[this._skinId];
+        const imageData = ctx.getImageData(0, 0, 480, 360);
+        const skin = this.runtime.renderer._allSkins[this._skinId];
         skin._setTexture(imageData);
         this.runtime.renderer.penStamp(this.runtime.penSkinId, this._drawableId);
         this.runtime.requestRedraw();
