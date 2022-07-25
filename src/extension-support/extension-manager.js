@@ -7,19 +7,20 @@ const BlockType = require('./block-type');
 // These extensions are currently built into the VM repository but should not be loaded at startup.
 // TODO: move these out into a separate repository?
 // TODO: change extension spec so that library info, including extension ID, can be collected through static methods
-const HttpUnit = require('../extensions/scratch3_http');
-const StringUnit = require('../extensions/scratch3_string');
-const Scratch3CanvasBlocks = require('../extensions/scratch3_canvas');
-const Scratch3HelloBlocks = require('../extensions/scratch3_hello_world')
+// const HttpUnit = require('../extensions/scratch3_http');
+// const StringUnit = require('../extensions/scratch3_string');
+// const Scratch3CanvasBlocks = require('../extensions/scratch3_canvas');
+// const Scratch3HelloBlocks = require('../extensions/scratch3_hello_world')
 const builtinExtensions = {
     // This is an example that isn't loaded with the other core blocks,
     // but serves as a reference for loading core blocks as extensions.
     coreExample: () => require('../blocks/scratch3_core_example'),
     // These are the non-core built-in extensions.
-    helloWorld :() => require('../extensions/scratch3_hello_world'),
-    HttpUnit: () => require('../extensions/scratch3_http'),
+    // helloWorld :() => require('../extensions/scratch3_hello_world'),
+    httpUnit: () => require('../extensions/scratch3_http'),
     string: () => require('../extensions/scratch3_string'),
     canvas: () => require('../extensions/scratch3_canvas'),
+    crypto: () => require('../extensions/scratch3_crypto'),
     pen: () => require('../extensions/scratch3_pen'),
     wedo2: () => require('../extensions/scratch3_wedo2'),
     music: () => require('../extensions/scratch3_music'),

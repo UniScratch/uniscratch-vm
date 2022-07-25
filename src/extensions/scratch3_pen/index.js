@@ -77,6 +77,7 @@ class Scratch3PenBlocks {
      */
     static get DEFAULT_PEN_STATE () {
         return {
+            penDownMode: 'point', // by yj
             penDown: false,
             color: 66.66,
             saturation: 100,
@@ -134,6 +135,29 @@ class Scratch3PenBlocks {
             this._penSkinId = this.runtime.renderer.createPenSkin();
             this._penDrawableId = this.runtime.renderer.createDrawable(StageLayering.PEN_LAYER);
             this.runtime.renderer.updateDrawableSkinId(this._penDrawableId, this._penSkinId);
+            // this.runtime.renderer.updateDrawableProperties(this._penDrawableId, {skinId: this._penSkinId});
+
+            // added by yj text print layer
+            this._printCanvas = document.createElement('canvas');
+            this._printCanvas.width = 480;
+            this._printCanvas.height = 360;
+            this._printSkinId = this.runtime.renderer.createBitmapSkin(this._printCanvas, 1);
+            this._printDrawableId = this.runtime.renderer.createDrawable(StageLayering.PEN_LAYER);
+            this.runtime.renderer.updateDrawableSkinId(this._printDrawableId, this._printSkinId);
+            this.runtime.renderer.updateDrawableVisible(this._printDrawableId, false);
+
+            // added by yj watermark layer
+            this._watermarkSkinId = this.runtime.renderer.createPenSkin();
+            this._watermarkDrawableId = this.runtime.renderer.createDrawable(StageLayering.PEN_LAYER);
+            this.runtime.renderer.setDrawableOrder(this._watermarkDrawableId, -Infinity, StageLayering.PEN_LAYER);
+            this.runtime.renderer.updateDrawableSkinId(this._watermarkDrawableId, this._watermarkSkinId);
+            // this.runtime.renderer.updateDrawableProperties(this._watermarkDrawableId, { skinId: this._watermarkSkinId });
+
+            // TODO(by yj): delete the codes?
+            this.runtime.penSkinId = this._penSkinId;
+            this.runtime.penDrawableId = this._penDrawableId;
+            this.runtime.watermarkSkinId = this._watermarkSkinId;
+            this.runtime.watermarkDrawableId = this._watermarkDrawableId;
         }
         return this._penSkinId;
     }
@@ -291,12 +315,37 @@ class Scratch3PenBlocks {
             }),
             blockIconURI: blockIconURI,
             blocks: [
+                // added by yj
+                {
+                    opcode: 'print',
+                    blockType: BlockType.COMMAND,
+                    text: '打印[TEXT]', // by yj 'print [TEXT]',
+                    arguments: {
+                        TEXT: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Hello world!'
+                        }
+                    }
+                },
+                {
+                    opcode: 'setPenDownMode',
+                    blockType: BlockType.COMMAND,
+                    text: '将落笔模式设为[PEN_DOWN_MODE]',
+                    arguments: {
+                        PEN_DOWN_MODE: {
+                            type: ArgumentType.STRING,
+                            menu: 'PEN_DOWN_MODE',
+                            defaultValue: 'point'
+                        }
+                    }
+                },
+
                 {
                     opcode: 'clear',
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.clear',
-                        default: 'erase all',
+                        default: '清空', // by yj 'erase all',
                         description: 'erase all pen trails and stamps'
                     })
                 },
@@ -305,7 +354,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.stamp',
-                        default: 'stamp',
+                        default: '图章', // by yj 'stamp',
                         description: 'render current costume on the background'
                     }),
                     filter: [TargetType.SPRITE]
@@ -315,7 +364,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.penDown',
-                        default: 'pen down',
+                        default: '落笔', // by yj 'pen down',
                         description: 'start leaving a trail when the sprite moves'
                     }),
                     filter: [TargetType.SPRITE]
@@ -325,7 +374,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.penUp',
-                        default: 'pen up',
+                        default: '抬笔', // by yj 'pen up',
                         description: 'stop leaving a trail behind the sprite'
                     }),
                     filter: [TargetType.SPRITE]
@@ -335,7 +384,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.setColor',
-                        default: 'set pen color to [COLOR]',
+                        default: '将画笔颜色设定为[COLOR]', // by yj 'set pen color to [COLOR]',
                         description: 'set the pen color to a particular (RGB) value'
                     }),
                     arguments: {
@@ -392,7 +441,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.changeSize',
-                        default: 'change pen size by [SIZE]',
+                        default: '将画笔大小增加[SIZE]', // by yj 'change pen size by [SIZE]',
                         description: 'change the diameter of the trail left by a sprite'
                     }),
                     arguments: {
@@ -408,7 +457,7 @@ class Scratch3PenBlocks {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'pen.setSize',
-                        default: 'set pen size to [SIZE]',
+                        default: '将画笔大小设定为[SIZE]', // by yj 'set pen size to [SIZE]',
                         description: 'set the diameter of a trail left by a sprite'
                     }),
                     arguments: {
@@ -486,6 +535,9 @@ class Scratch3PenBlocks {
                 }
             ],
             menus: {
+                // by yj
+                PEN_DOWN_MODE: ['point', 'no point'],
+
                 colorParam: {
                     acceptReporters: true,
                     items: this._initColorParam()
@@ -534,7 +586,7 @@ class Scratch3PenBlocks {
         }
 
         const penSkinId = this._getPenLayerID();
-        if (penSkinId >= 0) {
+        if (penSkinId >= 0 && penState.penDownMode == 'point'/* by yj */) {
             this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, target.x, target.y);
             this.runtime.requestRedraw();
         }
@@ -764,6 +816,54 @@ class Scratch3PenBlocks {
         penState.brightness = 100 * hsv.v;
 
         this._updatePenColor(penState);
+    }
+
+    // added by yj
+    print (args, util) {
+        const target = util.target;
+        const penState = this._getPenState(target);
+        const penAttributes = penState.penAttributes;
+        const penSkinId = this._getPenLayerID();
+        const skin = util.target.runtime.renderer._allSkins[penSkinId];
+
+        const w = util.target.runtime.constructor.STAGE_WIDTH;
+        const h = util.target.runtime.constructor.STAGE_HEIGHT;
+        const ctx = this._printCanvas.getContext('2d');
+        ctx.clearRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(w / 2 + util.target.x, h / 2 - util.target.y + Math.max(12, penAttributes.diameter));
+        ctx.font = `normal ${Math.max(12, penAttributes.diameter)}px Arial`;
+
+        ctx.strokeStyle = Color.rgbToHex(Color.hsvToRgb({
+            h: penState.color * 360 / 100,
+            s: penState.saturation / 100,
+            v: penState.brightness / 100
+        }));
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.rotate(2 * Math.PI * (util.target.direction - 90) / 360);
+
+        /* if (this._penMode == 'erase') {
+            ctx.globalCompositeOperation = "destination-out";
+        }
+        else {
+            ctx.globalCompositeOperation = "source-over";
+        }*/
+
+        ctx.fillText(args.TEXT, 0, 0);
+        ctx.restore();
+
+        const printSkin = util.target.runtime.renderer._allSkins[this._printSkinId];
+        const imageData = ctx.getImageData(0, 0, w, h);
+        printSkin._setTexture(imageData);
+        this.runtime.renderer.penStamp(penSkinId, this._printDrawableId);
+
+        this.runtime.requestRedraw();
+    }
+    setPenDownMode (args, util) {
+        const target = util.target;
+        const penState = this._getPenState(target);
+
+        penState.penDownMode = args.PEN_DOWN_MODE;
     }
 }
 
